@@ -19,32 +19,29 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
-	"krishnaiyer.dev/golang/datasink/pkg/device"
 	conf "krishnaiyer.dev/golang/dry/pkg/config"
 	logger "krishnaiyer.dev/golang/dry/pkg/logger"
-)
-
-const (
-	defaultBufferSize = 64
+	"krishnaiyer.dev/golang/ghpm/pkg/client"
 )
 
 // Config contains the configuration.
 type Config struct {
+	Client client.Config `name:"client" description:"The GitHub client configuration"`
 }
 
 var (
-	config  = &Config{}
-	manager *conf.Manager
-	baseCtx = context.Background()
-	devices = make(map[string]device.Device)
+	config   = &Config{}
+	manager  *conf.Manager
+	ghClient = client.New(&config.Client)
+	ctx      context.Context
 
 	// Root is the root of the commands.
 	Root = &cobra.Command{
-		Use:           "datasink",
+		Use:           "ghpm",
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		Short:         "datasink is tool that acts as acts as a server with multiple protocols (ex: mqtt, websocket) for incoming traffic and writes to a time series database",
-		Long:          `datasink is tool that acts as acts as a server with multiple protocols (ex: mqtt, websocket) for incoming traffic and writes to a time series database. More documentation at https://krishnaiyer.dev/golang/datasink`,
+		Short:         "ghpm is a tool to manage github repositories",
+		Long:          `ghpm is a tool to manage github repositories.`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			err := manager.ReadFromFile(cmd.Flags())
 			if err != nil {
@@ -54,12 +51,7 @@ var (
 			if err != nil {
 				panic(err)
 			}
-			return nil
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, cancel := context.WithCancel(baseCtx)
-			defer cancel()
-
+			ctx = context.Background()
 			l, err := logger.New(ctx, false)
 			if err != nil {
 				panic(err)

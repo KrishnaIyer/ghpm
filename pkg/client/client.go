@@ -37,7 +37,7 @@ type Client struct {
 }
 
 // NewClient creates a new client.
-func NewClient(config *Config) *Client {
+func New(config *Config) *Client {
 	return &Client{
 		config: config,
 		client: &http.Client{
@@ -47,7 +47,7 @@ func NewClient(config *Config) *Client {
 }
 
 // Do executes a request.
-func (c *Client) Do(ctx context.Context, method string, url string, body []byte) ([]byte, error) {
+func (c *Client) do(ctx context.Context, method string, url string, body []byte) ([]byte, error) {
 	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
@@ -74,4 +74,19 @@ func (c *Client) Do(ctx context.Context, method string, url string, body []byte)
 	default:
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
+}
+
+// Get executes a GET request.
+func (c *Client) Get(ctx context.Context, url string) ([]byte, error) {
+	return c.do(ctx, http.MethodGet, url, nil)
+}
+
+// Post executes a POST request.
+func (c *Client) Post(ctx context.Context, url string, body []byte) ([]byte, error) {
+	return c.do(ctx, http.MethodPost, url, body)
+}
+
+// Delete executes a DELETE request.
+func (c *Client) Delete(ctx context.Context, url string) ([]byte, error) {
+	return c.do(ctx, http.MethodDelete, url, nil)
 }

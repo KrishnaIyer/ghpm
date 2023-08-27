@@ -12,31 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package milestones
-
-import "krishnaiyer.dev/golang/ghpm/pkg/client"
-
-type Config struct {
-	Username string `name:"username" description:"The GitHub user or organization name"`
-	Repo     string `name:"repo" description:"The GitHub repository name"`
-}
-
-// Manager is a GitHub manager.
-type Manager struct {
-	client *client.Client
-}
-
-// New creates a new manager.
-func New(client *client.Client) *Manager {
-	return &Manager{
-		client: client,
-	}
-}
-
-// ListMilestones lists all milestones.
-func ListMilestones() {
-}
-
-// ListPastMilestones lists all past milestones.
-func ListPastMilestones() {
-}
+package messages

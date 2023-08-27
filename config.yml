@@ -1,0 +1,4 @@
+username: ""
+repositories:
+  - name: "repo"
+    username: "username" # Overrides the global username

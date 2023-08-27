@@ -1,2 +1,3 @@
 # ghpm
-A simple tool in golang for Project Management tasks on Github
+
+A simple tool in golang to manager Github repositories.
