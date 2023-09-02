@@ -2,4 +2,8 @@ token: "abcd" # Github API key
 username: "krishnaiyer"
 repositories:
   - name: "ghpm"
-    username: "username" # Overrides the global username
+    username: "" # Overrides the global username
+  - name: "helm-gopg"
+    username: "" # Overrides the global username
+  - name: "react-dev"
+    username: "" # Overrides the global username

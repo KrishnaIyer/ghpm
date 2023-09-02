@@ -44,50 +44,61 @@ var (
 		Short: "Get milestones",
 		Long:  `Get milestones.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			milestones, _, err := client.Issues.ListMilestones(
-				ctx,
-				config.Username,
-				config.Repositories[0].Name,
-				&github.MilestoneListOptions{
-					State:     "all",
-					Sort:      "due_on",
-					Direction: "asc",
-				})
-			if err != nil {
-				return err
-			}
-
-			fmt.Println("##################################################")
-			fmt.Println("\t\t Milestones")
-			fmt.Println("##################################################")
-			fmt.Printf("Repo: %s\n", config.Repositories[0].Name)
-			fmt.Println("--------------------------------------------------")
-			for _, milestone := range milestones {
-				var (
-					dueOn    string
-					closedAt string
-				)
-
-				if milestone.DueOn != nil {
-					dueOn = milestone.DueOn.Format("02 Jan 06")
+			byRepo := map[string][][]byte{}
+			for _, repo := range config.Repositories {
+				userName := config.Username
+				if repo.Username != "" {
+					userName = repo.Username
 				}
-				if milestone.ClosedAt != nil {
-					closedAt = milestone.ClosedAt.Format("02 Jan 06 ")
-				}
-
-				m := Milestone{
-					Title:        *milestone.Title,
-					Description:  *milestone.Description,
-					OpenIssues:   *milestone.OpenIssues,
-					ClosedIssues: *milestone.ClosedIssues,
-					ClosedAt:     closedAt,
-					DueOn:        dueOn,
-				}
-				milestoneJSON, err := json.Marshal(m)
+				milestones, _, err := client.Issues.ListMilestones(
+					ctx,
+					userName,
+					repo.Name,
+					&github.MilestoneListOptions{
+						State:     "all",
+						Sort:      "due_on",
+						Direction: "asc",
+					})
 				if err != nil {
 					return err
 				}
-				fmt.Println(string(milestoneJSON))
+				for _, milestone := range milestones {
+					var (
+						dueOn    string
+						closedAt string
+					)
+
+					if milestone.DueOn != nil {
+						dueOn = milestone.DueOn.Format("02 Jan 06")
+					}
+					if milestone.ClosedAt != nil {
+						closedAt = milestone.ClosedAt.Format("02 Jan 06 ")
+					}
+
+					m := Milestone{
+						Title:        *milestone.Title,
+						Description:  *milestone.Description,
+						OpenIssues:   *milestone.OpenIssues,
+						ClosedIssues: *milestone.ClosedIssues,
+						ClosedAt:     closedAt,
+						DueOn:        dueOn,
+					}
+					jsonValue, err := json.Marshal(m)
+					if err != nil {
+						return err
+					}
+					byRepo[repo.Name] = append(byRepo[repo.Name], jsonValue)
+				}
+			}
+			fmt.Println("##################################################")
+			fmt.Println("\t\t Milestones")
+			fmt.Println("##################################################")
+			for repo, milestones := range byRepo {
+				fmt.Printf("Repository: %s\n", repo)
+				for i, milestone := range milestones {
+					fmt.Printf("%d. %s:\n", i+1, milestone)
+				}
+				fmt.Println("--------------------------------------------------")
 			}
 			return nil
 		},
