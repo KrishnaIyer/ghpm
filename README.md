@@ -2,15 +2,30 @@
 
 A simple tool in golang to manage Github repositories.
 
-## Token Authentication
+## Usage
 
-Export the token as an environment variable.
+1. Export the token as an environment variable.
 
 ```bash
 $ export GHPM_TOKEN=TOKEN
 ```
 
-## Usage
+2. Create a YAML config file with the list of repositories. See the example [config.yml](./config.yml).
+
+3. Run the required commands. Ex: List all milestones across all the repositories in the `config.yml` file.
+
+```bash
+$ ghpm milestones get
+##################################################
+		 Milestones
+##################################################
+Repository: ghpm
+1. {"title":"Second Test Milestone","description":"This is another test milestone"}
+2. {"title":"Test Milestone","due_on":"08 Sep 23"}
+--------------------------------------------------
+```
+
+## Options
 
 ```
 Usage:

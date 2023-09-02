@@ -1,0 +1,43 @@
+project_name: ghpm
+
+before:
+  hooks:
+    - go mod download
+
+builds:
+- id: ghpm
+  env:
+    - CGO_ENABLED=0
+  ldflags:
+    - -s
+    - -w
+    - -X krishnaiyer.dev/golang/ghpm/cmd.version={{.Version}}
+    - -X krishnaiyer.dev/golang/ghpm/cmd.gitCommit={{.Commit}}
+    - -X krishnaiyer.dev/golang/ghpm/cmd.buildDate={{.Date}}
+  goos: [darwin, linux, windows]
+  goarch: [ "386", amd64, arm, arm64]
+  ignore:
+    - { goos: darwin, goarch: "386" }
+
+archives:
+- id: tar
+  builds:
+    - ghpm
+  files:
+    - LICENSE
+    - README.md
+    - config.yaml
+  format: tar.gz
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-dev"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'

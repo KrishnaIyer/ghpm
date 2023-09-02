@@ -1,0 +1,26 @@
+name: test
+on:
+  push:
+    paths:
+      - '**.go'
+
+jobs:
+  test:
+    name: buildandtest
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '~1.19'
+    - name: Install helm
+      uses: azure/setup-helm@v3
+      with:
+        version: 'v3.10.3'
+      id: install
+    - name: Check out code
+      uses: actions/checkout@v3
+    - name: Download dependencies
+      run: make deps
+    - name: Run package tests
+      run: make test
