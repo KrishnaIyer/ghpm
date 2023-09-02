@@ -3,7 +3,5 @@ username: "krishnaiyer"
 repositories:
   - name: "ghpm"
     username: "" # Overrides the global username
-  - name: "helm-gopg"
-    username: "" # Overrides the global username
-  - name: "react-dev"
-    username: "" # Overrides the global username
+  # - name: "helm-gopg"
+  #   username: "" # Overrides the global username
