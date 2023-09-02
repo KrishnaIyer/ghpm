@@ -18,22 +18,31 @@ import (
 	"context"
 	"log"
 
+	"github.com/google/go-github/v54/github"
 	"github.com/spf13/cobra"
 	conf "krishnaiyer.dev/golang/dry/pkg/config"
 	logger "krishnaiyer.dev/golang/dry/pkg/logger"
-	"krishnaiyer.dev/golang/ghpm/pkg/client"
 )
 
 // Config contains the configuration.
 type Config struct {
-	Client client.Config `name:"client" description:"The GitHub client configuration"`
+	Token        string `name:"token" description:"The GitHub token"`
+	Username     string `name:"username" description:"The GitHub user or organization name"`
+	Repositories []struct {
+		Name     string `name:"name" description:"The GitHub repository name"`
+		Username string `name:"username" description:"The GitHub user or organization name. Overrides global username"`
+	} `name:"repositories" description:"The GitHub repositories"`
 }
 
+const (
+	baseURL = "https://api.github.com"
+)
+
 var (
-	config   = &Config{}
-	manager  *conf.Manager
-	ghClient = client.New(&config.Client)
-	ctx      context.Context
+	config  = &Config{}
+	manager *conf.Manager
+	client  *github.Client
+	ctx     context.Context
 
 	// Root is the root of the commands.
 	Root = &cobra.Command{
@@ -57,6 +66,7 @@ var (
 				panic(err)
 			}
 			ctx = logger.NewContextWithLogger(ctx, l)
+			client = github.NewTokenClient(ctx, config.Token)
 			return nil
 		},
 	}
@@ -70,7 +80,7 @@ func Execute() {
 }
 
 func init() {
-	manager = conf.New("config")
+	manager = conf.New("ghpm")
 	manager.InitFlags(*config)
 	// This line is needed to persist the config file to subcommands.
 	manager.AddConfigFlag(manager.Flags())

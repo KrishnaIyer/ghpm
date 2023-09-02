@@ -1,4 +1,5 @@
-username: ""
+token: "abcd" # Github API key
+username: "krishnaiyer"
 repositories:
-  - name: "repo"
+  - name: "ghpm"
     username: "username" # Overrides the global username
