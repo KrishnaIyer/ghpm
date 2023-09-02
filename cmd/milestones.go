@@ -206,6 +206,99 @@ Milestones not found are skipped.`,
 			return nil
 		},
 	}
+	closeMineStonesCmd = &cobra.Command{
+		Use:   "close [title]",
+		Short: "Close a milestone in all repositories",
+		Long: `Close a milestone in all the repositories in the configuration.
+Milestones not found are skipped.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 1 {
+				return fmt.Errorf("no title provided")
+			}
+			title := args[0]
+			for _, repo := range config.Repositories {
+				userName := config.Username
+				if repo.Username != "" {
+					userName = repo.Username
+				}
+				milestones, _, err := client.Issues.ListMilestones(
+					ctx,
+					userName,
+					repo.Name,
+					&github.MilestoneListOptions{
+						State:     "all",
+						Sort:      "due_on",
+						Direction: "asc",
+					})
+				if err != nil {
+					return err
+				}
+				for _, milestone := range milestones {
+					if *milestone.Title != title {
+						continue
+					}
+					milestone, _, err := client.Issues.EditMilestone(
+						ctx,
+						userName,
+						repo.Name,
+						*milestone.Number,
+						&github.Milestone{
+							State: &[]string{"closed"}[0],
+						})
+					if err != nil {
+						return err
+					}
+					fmt.Printf("Closed milestone %s in repository %s\n", *milestone.Title, repo.Name)
+				}
+			}
+			return nil
+		},
+	}
+	deleteMilestoneCmd = &cobra.Command{
+		Use:   "delete [title]",
+		Short: "Delete a milestone in all repositories",
+		Long: `Delete a milestone in all the repositories in the configuration.
+Milestones not found are skipped.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 1 {
+				return fmt.Errorf("no title provided")
+			}
+			title := args[0]
+			for _, repo := range config.Repositories {
+				userName := config.Username
+				if repo.Username != "" {
+					userName = repo.Username
+				}
+				milestones, _, err := client.Issues.ListMilestones(
+					ctx,
+					userName,
+					repo.Name,
+					&github.MilestoneListOptions{
+						State:     "all",
+						Sort:      "due_on",
+						Direction: "asc",
+					})
+				if err != nil {
+					return err
+				}
+				for _, milestone := range milestones {
+					if *milestone.Title != title {
+						continue
+					}
+					_, err := client.Issues.DeleteMilestone(
+						ctx,
+						userName,
+						repo.Name,
+						*milestone.Number)
+					if err != nil {
+						return err
+					}
+					fmt.Printf("Deleted milestone %s in repository %s\n", *milestone.Title, repo.Name)
+				}
+			}
+			return nil
+		},
+	}
 )
 
 func init() {
@@ -220,4 +313,6 @@ func init() {
 	milestonesCmd.AddCommand(updateMilestonesCmd)
 	updateMilestonesCmd.Flags().String("description", "", "Description of the milestone")
 	updateMilestonesCmd.Flags().String("due-on", "", "Due date of the milestone (YYYY-MM-DD)")
+	milestonesCmd.AddCommand(closeMineStonesCmd)
+	milestonesCmd.AddCommand(deleteMilestoneCmd)
 }
