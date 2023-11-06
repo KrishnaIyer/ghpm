@@ -3,9 +3,8 @@ module krishnaiyer.dev/golang/ghpm
 go 1.20
 
 require (
-	github.com/aws/aws-sdk-go v1.45.2
 	github.com/google/go-github/v54 v54.0.0
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	krishnaiyer.dev/golang/dry v0.0.0-20221204094448-a2d18c26bb44
 )
 
@@ -17,7 +16,6 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
